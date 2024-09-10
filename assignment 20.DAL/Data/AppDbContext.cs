@@ -9,12 +9,16 @@ using System.Threading.Tasks;
 
 namespace assignment_20.DAL.Data
 {
-    internal class AppDbContext : DbContext
+    public class AppDbContext : DbContext
     {
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            optionsBuilder.UseSqlServer("Server=KERLOSS; DataBase=C42G02MVC; Trusted_Connection:True; MultipleActiveResultSets=True;");
+            
         }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer("Server=KERLOSS; DataBase=C42G02MVC; Trusted_Connection:True; MultipleActiveResultSets=True;");
+        //}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
