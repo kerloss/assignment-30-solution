@@ -1,4 +1,4 @@
-﻿using assignment_30.PL.Models;
+﻿using assignment_30.PL.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
