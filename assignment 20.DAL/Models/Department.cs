@@ -15,6 +15,7 @@ namespace assignment_20.DAL.Models
         public string Code { get; set; }    //.Net 5 allow null
         [Required(ErrorMessage = "Name is required!")]
         public string Name { get; set; }
+        [Display(Name ="Date Of Creation")]
         public DateTime DateOfCreation { get; set; }
     }
 }
