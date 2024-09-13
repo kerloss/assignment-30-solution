@@ -24,10 +24,12 @@ namespace assignment_20.DAL.Data
         {
             //Fluent APIS
             //modelBuilder.ApplyConfiguration<Department>(new DepartmentConfiguration());
+
             modelBuilder.ApplyConfigurationsFromAssembly(System.Reflection.Assembly.GetExecutingAssembly());  //applyCOnfiguration for all model configuration
             base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<Department> Departments { get; set; }
+        public DbSet<Employee> Employees { get; set; }
     }
 }
