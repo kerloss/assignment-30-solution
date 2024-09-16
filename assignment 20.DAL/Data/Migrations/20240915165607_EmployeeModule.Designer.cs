@@ -10,7 +10,7 @@ using assignment_20.DAL.Data;
 namespace assignment_20.DAL.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240913150100_EmployeeModule")]
+    [Migration("20240915165607_EmployeeModule")]
     partial class EmployeeModule
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -88,7 +88,7 @@ namespace assignment_20.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Employee");
+                    b.ToTable("Employees");
                 });
 #pragma warning restore 612, 618
         }

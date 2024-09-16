@@ -1,4 +1,5 @@
 ﻿using assignment_20.BLL.Interfacies;
+using assignment_20.BLL.Repositories;
 using assignment_20.DAL.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using System;
 
 namespace assignment_30.PL.Controllers
 {
-    public class DepartmentController : Controller
+    public class EmployeeController : Controller
     {
         // 1. inhertance => DepartmentController is a Controller
         // 2. Association => DepartmentController has a DepartmentRepository [Aggregation,Composition]
@@ -15,22 +16,31 @@ namespace assignment_30.PL.Controllers
         /// Composition : Required
         /// Aggregation : optional [NULL]
         /// </summary>
-
-        private readonly IDepartmentRepository _IdepartmentRepository;
+        
+        private readonly IEmployeeRepository _IemployeeRepository;
         private readonly IWebHostEnvironment _env;
 
-        public DepartmentController(IDepartmentRepository departmentRepository , IWebHostEnvironment env)
+        public EmployeeController(IEmployeeRepository employeeRepository,IWebHostEnvironment env)
         {
-            _IdepartmentRepository = departmentRepository;
+            _IemployeeRepository = employeeRepository;
             _env = env;
         }
 
-        //BaseUrl/Department/Index
+        //BaseUrl/Employee/Index
         public IActionResult Index()
         {
+            TempData.Keep();    //if u want to keep tempData in next Action to use it
             //Get All
-            var Departments = _IdepartmentRepository.GetAll();
-            return View(Departments);
+            var Employees = _IemployeeRepository.GetAll();
+            //Extra Info
+            //binding through View's Dictionary : transfer Data from Action to View
+            //one way data Binding
+            //1. ViewDate => key, Value
+            ViewData["Message"] = "Hello ViewData";
+            //2. ViewBag
+            ViewBag.Message = "Hello ViewBag";
+
+            return View(Employees);
         }
 
         public IActionResult Create()
@@ -39,25 +49,25 @@ namespace assignment_30.PL.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]  //dont allow any tools talking with website only website
-        public IActionResult Create(Department department)
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Employee employee)
         {
-            //3. TempData => from Actoin to Action
+            //3. TempData => from Action to Action
+
             if (ModelState.IsValid)
             {
-                var count = _IdepartmentRepository.Add(department);
-                if (count > 0) 
+                var count = _IemployeeRepository.Add(employee);
+                if (count > 0)
                 {
-                    TempData["Message"] = "Create Department Successfuly";
-                    //return RedirectToAction(nameof(Index));
+                    TempData["Message"] = "Employee created Succesfully";
                 }
                 else
                 {
                     TempData["Message"] = "An Error Occured";
                 }
-                    return RedirectToAction("Index");
+                    return RedirectToAction(nameof(Index));
             }
-            return View(department);
+            return View(employee);
         }
 
         public IActionResult Details(int? id, string viewName = "Details")
@@ -66,50 +76,48 @@ namespace assignment_30.PL.Controllers
             {
                 return BadRequest(); // 400
             }
-            var department = _IdepartmentRepository.GetById(id.Value);
-            if (department == null)
+            var employee = _IemployeeRepository.GetById(id.Value);
+            if (employee == null)
             {
                 return NotFound(); // 404
             }
-            return View(viewName, department);
+            return View(viewName, employee);
         }
 
-        // Department/Edit/10
-        // Department/Edit
         public IActionResult Edit(int? id)
         {
             //if (!id.HasValue)
             //{
             //    return BadRequest(); // 400
             //}
-            //var department = _IdepartmentRepository.GetById(id.Value);
-            //if (department == null)
+            //var employee = _IemployeeRepository.GetById(id.Value);
+            //if (employee == null)
             //{
             //    NotFound(); // 404
             //}
-            //return View(department);
+            //return View(employee);
             return Details(id, "Edit");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]  //dont allow any tools talking with website only website
-        public IActionResult Edit([FromRoute] int id, Department department)  
+        public IActionResult Edit([FromRoute] int id, Employee employee)
         // take id from Route not from Form (more secure)
         {
-            if (id != department.Id)
+            if (id != employee.Id)
             {
                 return BadRequest();
             }
 
             if (!ModelState.IsValid)
             {
-                return View(department);
+                return View(employee);
             }
 
             try
             {
-                _IdepartmentRepository.Update(department);
-                TempData["Message"] = "Edit Department Successfuly";
+                _IemployeeRepository.Update(employee);
+                TempData["Message"] = "Edit Employee Successufuly";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -119,7 +127,7 @@ namespace assignment_30.PL.Controllers
                     ModelState.AddModelError(string.Empty, ex.Message);
                 else
                     ModelState.AddModelError(string.Empty, "An Error occured during update Department");
-                return View(department);
+                return View(employee);
             }
         }
 
@@ -130,12 +138,21 @@ namespace assignment_30.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(Department department)
+        public IActionResult Delete([FromRoute]int id, Employee employee)
         {
+            if (id != employee.Id)
+            {
+                return BadRequest();
+            }
+            if (!ModelState.IsValid)
+            {
+                return View(employee);
+            }
+
             try
             {
-                _IdepartmentRepository.Delete(department);
-                TempData["MessageDelete"] = "Delete Department Successfuly";
+                _IemployeeRepository.Delete(employee);
+                TempData["MessageDelete"] = "Delete Employee Successfuly";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -148,7 +165,7 @@ namespace assignment_30.PL.Controllers
                 {
                     ModelState.AddModelError(string.Empty, "An Error occured during deleting department");
                 }
-                return View(department);
+                return View(employee);
             }
         }
     }

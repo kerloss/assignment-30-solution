@@ -8,9 +8,8 @@ using System.Threading.Tasks;
 namespace assignment_20.DAL.Models
 {
     // model [class represent table in DataBase]
-    public class Department
+    public class Department : ModelBase
     {
-        public int Id { get; set; } //PK Identity (1,1)
         [Required(ErrorMessage ="Code is required!")]
         public string Code { get; set; }    //.Net 5 allow null
         [Required(ErrorMessage = "Name is required!")]

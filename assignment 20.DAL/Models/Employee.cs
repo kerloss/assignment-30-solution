@@ -21,10 +21,8 @@ namespace assignment_20.DAL.Models
         FullTime = 1,
         PartTime = 2
     }
-    public class Employee
-    {
-        public int Id { get; set; } //PK
-        
+    public class Employee : ModelBase
+    {        
         [Required(ErrorMessage ="Name Is Required!")]
         [MinLength(4,ErrorMessage ="Minimum Name Length is 4 charactar")]
         [MaxLength(50,ErrorMessage ="Maximum Name Length is 4 charactar")]

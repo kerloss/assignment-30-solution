@@ -1,0 +1,66 @@
+﻿@model IEnumerable<Employee>
+@{
+    ViewData["Title"] = "Index";
+
+    // string ViewDataMessage = ViewData["Message"] as string;
+    // string ViewBagMessage = ViewBag.Message;
+}
+@* <div class="alert alert-warning">@ViewData=["Message"]</div> *@
+@* <div class="alert alert-info">@ViewBag.Message</div> *@
+@if(!string.IsNullOrEmpty(TempData["Message"] as string))
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+@if(!string.IsNullOrEmpty(TempData["MessageDelete"] as string))
+{
+    <div class="alert alert-danger">@TempData["MessageDelete"]</div>
+}
+<h1>All Employee</h1>
+<br />
+<br />
+
+<a asp-controller="Employee" asp-action="Create" class="btn btn-primary">Create New Department</a>
+
+@* Model =>data that view is render it  *@
+@if (Model.Count() > 0)
+{
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(E => E.Name)</th>
+                <th>@Html.DisplayNameFor(E => E.Age)</th>
+                <th>@Html.DisplayNameFor(E => E.Address)</th>
+                <th>@Html.DisplayNameFor(E => E.Salary)</th>
+                <th>@Html.DisplayNameFor(E => E.PhoneNumber)</th>
+                <th>@Html.DisplayNameFor(E => E.IsActive)</th>
+                <th>@Html.DisplayNameFor(E => E.Gender)</th>
+                <th>@Html.DisplayNameFor(E => E.Email)</th>
+                <th>Details</th>
+                <th>Update</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var employee in Model)
+            {
+                <tr>
+                    <td>@employee.Name</td>
+                    <td>@employee.Age</td>
+                    <td>@employee.Address</td>
+                    <td>@Html.DisplayFor(M => employee.Salary)</td>
+                    <td>@employee.PhoneNumber</td>
+                    <td>@Html.DisplayFor(M => employee.IsActive)</td>
+                    <td>@employee.Gender</td>
+                    <td>@Html.DisplayFor(M => employee.Email)</td>
+                    <partial name="_ButtonsPartial" model="@employee.Id"></partial>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="mt-5 alert alert-warning text-center">
+        <h3>There is no Department</h3>
+    </div>
+}
