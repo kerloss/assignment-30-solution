@@ -1,14 +1,14 @@
-﻿@model Department
+﻿@model Employee
 @{
     ViewData["Title"] = "Details";
 }
 
-<h1>Department Details</h1>
+<h1>Employee Details</h1>
 <br />
 <br />
 
 <div>
-    <partial name="PartialViews/DeleteDetailsDepartmentPartial"></partial>
+    <partial name="PartialViews/DeleteDetailsEmployeePartial"></partial>
 
 
     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary mt-5">Edit</a>

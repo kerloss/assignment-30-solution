@@ -1,4 +1,4 @@
-﻿@model Department
+﻿@model Employee
 @{
     ViewData["Title"] = "Delete";
 }
@@ -8,7 +8,7 @@
 <br />
 
 <form asp-action="Delete" asp-route-id="@Model.Id">
-    <partial name="PartialViews/DeleteDetailsDepartmentPartial"></partial>
+    <partial name="PartialViews/DeleteDetailsEmployeePartial"></partial>
 
 
     <div class="my-3">

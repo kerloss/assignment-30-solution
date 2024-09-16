@@ -1,17 +1,17 @@
-﻿@model Department
+﻿@model Employee
 @{
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit Department</h1>
+<h1>Edit Employee</h1>
 <br />
 <br />
 
 <form asp-action="Edit">
     @*  default mthod is Post *@
     <div asp-validation-summary="All" class="alert alert-danger my-4"></div>
-    <partial name="PartialViews/CreateEditDepartmentPartial"></partial>
 
+    <partial name="PartialViews/CreateEditEmployeePartial"></partial>
 
     <div class="my-4">
         <input type="submit" value="Save" class="btn btn-primary" />

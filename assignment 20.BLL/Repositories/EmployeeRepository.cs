@@ -10,42 +10,19 @@ using System.Threading.Tasks;
 
 namespace assignment_20.BLL.Repositories
 {
-    public class EmployeeRepository : IEmployeeRepository
+    public class EmployeeRepository : GenericRepository<Employee> , IEmployeeRepository
     {
-        private readonly AppDbContext _appDbContext;
+        //private readonly AppDbContext _appDbContext;
 
-        public EmployeeRepository(AppDbContext DbContext)   //Ask CLR for creating object from DbContext
+        public EmployeeRepository(AppDbContext DbContext) : base(DbContext)   //Ask CLR for creating object from DbContext
         {
-            _appDbContext = DbContext;
-        }
-        public int Add(Employee employee)
-        {
-            //Call with DataBase
-            _appDbContext.Employees.Add(employee);
-            return _appDbContext.SaveChanges();
+            //_appDbContext = DbContext;
         }
 
-        public int Delete(Employee employee)
+        public IQueryable<Employee> GetEmployeeByAddress(string address)
         {
-            _appDbContext.Employees.Remove(employee);
-            return _appDbContext.SaveChanges();
-        }
-
-        public IEnumerable<Employee> GetAll()
-        {
-            return _appDbContext.Employees.AsNoTracking().ToList();
-        }
-
-        public Employee GetById(int id)
-        {
-            //Find() => search localy first and after that search in DB
-            return _appDbContext.Employees.Find(id);
-        }
-
-        public int Update(Employee employee)
-        {
-            _appDbContext.Employees.Update(employee);
-            return _appDbContext.SaveChanges();
+            return _appDbContext.Employees.Where(e => e.Address.ToLower().Contains(address.ToLower()));
+            //return _appDbContext.Employees.Where(e => e.Address.ToLower() == address.ToLower());
         }
     }
 }
