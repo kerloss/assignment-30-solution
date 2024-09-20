@@ -37,7 +37,14 @@ namespace assignment_20.BLL.Repositories
 
         public IEnumerable<T> GetAll()
         {
+            if (typeof(T) == typeof(Employee))
+            {
+            return (IEnumerable<T>)_appDbContext.Employees.Include(E=>E.departments).AsNoTracking().ToList();
+            }
+            else
+            {
             return _appDbContext.Set<T>().AsNoTracking().ToList();
+            }
         }
 
         public T GetById(int id)

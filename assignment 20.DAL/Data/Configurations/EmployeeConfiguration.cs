@@ -13,6 +13,7 @@ namespace assignment_20.DAL.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Employee> builder)
         {
+            //Fluent API
             builder.Property(E=>E.Salary).HasColumnType("decimal(18,2)");
 
             //HasConversion take 2 paramters first one that property saved in DB then it save with string
@@ -21,6 +22,13 @@ namespace assignment_20.DAL.Data.Configurations
                 (Gender) => Gender.ToString(),
                 (genderAsString => (Gender)Enum.Parse(typeof(Gender), genderAsString, true))
                 );
+
+            builder.Property(E => E.Name)
+                   .IsRequired(true)
+                   .HasMaxLength(50);
+
+            //builder.Property(E => E.PhoneNumber).HasColumnName("Phone Number");
+            //builder.Property(E => E.HireDate).HasColumnName("Hire Date");
         }
     }
 }

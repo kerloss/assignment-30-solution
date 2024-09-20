@@ -15,6 +15,12 @@ namespace assignment_20.DAL.Data.Configurations
         {
             //Fluent APIS
             builder.Property(D => D.Id).UseIdentityColumn(10, 10);
+            builder.HasMany(E => E.employees)
+                   .WithOne(D => D.departments)
+                   .OnDelete(DeleteBehavior.Cascade);
+            builder.Property(E => E.Code).IsRequired(true);
+            builder.Property(E => E.Name).IsRequired(true);
+            //builder.Property(E => E.DateOfCreation).HasColumnName("Date Of Creation");
         }
     }
 }

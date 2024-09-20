@@ -1,9 +1,13 @@
 ﻿using assignment_20.BLL.Interfacies;
 using assignment_20.DAL.Models;
+using assignment_30.PL.ViewModels;
+using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace assignment_30.PL.Controllers
 {
@@ -18,19 +22,31 @@ namespace assignment_30.PL.Controllers
 
         private readonly IDepartmentRepository _IdepartmentRepository;
         private readonly IWebHostEnvironment _env;
+        private readonly IMapper _Imapper;
 
-        public DepartmentController(IDepartmentRepository departmentRepository , IWebHostEnvironment env)
+        public DepartmentController(IDepartmentRepository departmentRepository , IWebHostEnvironment env, IMapper mapper)
         {
             _IdepartmentRepository = departmentRepository;
             _env = env;
+            _Imapper = mapper;
         }
 
         //BaseUrl/Department/Index
-        public IActionResult Index()
+        public IActionResult Index(string searchInput)
         {
             //Get All
+            if (string.IsNullOrEmpty(searchInput))
+            {
             var Departments = _IdepartmentRepository.GetAll();
-            return View(Departments);
+                var mappedDepartment = _Imapper.Map<IEnumerable<Department>, IEnumerable<DepartmentViewModel>>(Departments);
+            return View(mappedDepartment);   
+            }
+            else
+            {
+                var Departments = _IdepartmentRepository.GetDepartmentByName(searchInput);
+                var mappedDepartment = _Imapper.Map<IEnumerable<Department>, IEnumerable<DepartmentViewModel>>(Departments);
+                return View(mappedDepartment);
+            }
         }
 
         public IActionResult Create()
@@ -40,12 +56,13 @@ namespace assignment_30.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]  //dont allow any tools talking with website only website
-        public IActionResult Create(Department department)
+        public IActionResult Create(DepartmentViewModel departmentViewModel)
         {
             //3. TempData => from Actoin to Action
             if (ModelState.IsValid)
             {
-                var count = _IdepartmentRepository.Add(department);
+                var mappedDepartment = _Imapper.Map<DepartmentViewModel, Department>(departmentViewModel);
+                var count = _IdepartmentRepository.Add(mappedDepartment);
                 if (count > 0) 
                 {
                     TempData["Message"] = "Create Department Successfuly";
@@ -57,7 +74,7 @@ namespace assignment_30.PL.Controllers
                 }
                     return RedirectToAction("Index");
             }
-            return View(department);
+            return View(departmentViewModel);
         }
 
         public IActionResult Details(int? id, string viewName = "Details")
@@ -93,22 +110,23 @@ namespace assignment_30.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]  //dont allow any tools talking with website only website
-        public IActionResult Edit([FromRoute] int id, Department department)  
+        public IActionResult Edit([FromRoute] int id, DepartmentViewModel departmentViewModel)  
         // take id from Route not from Form (more secure)
         {
-            if (id != department.Id)
+            if (id != departmentViewModel.Id)
             {
                 return BadRequest();
             }
 
             if (!ModelState.IsValid)
             {
-                return View(department);
+                return View(departmentViewModel);
             }
 
             try
             {
-                _IdepartmentRepository.Update(department);
+                var mappedDepartment = _Imapper.Map<DepartmentViewModel, Department>(departmentViewModel);
+                _IdepartmentRepository.Update(mappedDepartment);
                 TempData["Message"] = "Edit Department Successfuly";
                 return RedirectToAction(nameof(Index));
             }
@@ -119,7 +137,7 @@ namespace assignment_30.PL.Controllers
                     ModelState.AddModelError(string.Empty, ex.Message);
                 else
                     ModelState.AddModelError(string.Empty, "An Error occured during update Department");
-                return View(department);
+                return View(departmentViewModel);
             }
         }
 
@@ -130,11 +148,12 @@ namespace assignment_30.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(Department department)
+        public IActionResult Delete(DepartmentViewModel departmentViewModel)
         {
             try
             {
-                _IdepartmentRepository.Delete(department);
+                var mappedDepartment = _Imapper.Map<DepartmentViewModel, Department>(departmentViewModel);
+                _IdepartmentRepository.Delete(mappedDepartment);
                 TempData["MessageDelete"] = "Delete Department Successfuly";
                 return RedirectToAction(nameof(Index));
             }
@@ -148,7 +167,7 @@ namespace assignment_30.PL.Controllers
                 {
                     ModelState.AddModelError(string.Empty, "An Error occured during deleting department");
                 }
-                return View(department);
+                return View(departmentViewModel);
             }
         }
     }

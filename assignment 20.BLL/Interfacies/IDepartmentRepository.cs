@@ -14,5 +14,7 @@ namespace assignment_20.BLL.Interfacies
         //int Add (Department department);
         //int Update (Department department);
         //int Delete (Department department);
+
+        IQueryable<Department> GetDepartmentByName(string name);
     }
 }

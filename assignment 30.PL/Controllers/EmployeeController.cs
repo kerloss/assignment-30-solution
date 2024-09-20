@@ -1,10 +1,14 @@
 ﻿using assignment_20.BLL.Interfacies;
 using assignment_20.BLL.Repositories;
 using assignment_20.DAL.Models;
+using assignment_30.PL.ViewModels;
+using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace assignment_30.PL.Controllers
 {
@@ -19,44 +23,75 @@ namespace assignment_30.PL.Controllers
         
         private readonly IEmployeeRepository _IemployeeRepository;
         private readonly IWebHostEnvironment _env;
+        private readonly IMapper _Imapper;
+        private readonly IDepartmentRepository _IdepartmentRepository;
 
-        public EmployeeController(IEmployeeRepository employeeRepository,IWebHostEnvironment env)
+        public EmployeeController(IEmployeeRepository employeeRepository,IWebHostEnvironment env /*,IDepartmentRepository departmentRepository*/, IMapper mapper)
         {
             _IemployeeRepository = employeeRepository;
             _env = env;
+            _Imapper = mapper;
+            //_IdepartmentRepository = departmentRepository;
         }
 
         //BaseUrl/Employee/Index
-        public IActionResult Index()
+        public IActionResult Index(string searchInput)
         {
-            TempData.Keep();    //if u want to keep tempData in next Action to use it
+            //TempData.Keep();    //if u want to keep tempData in next Action to use it
             //Get All
-            var Employees = _IemployeeRepository.GetAll();
+            if (string.IsNullOrEmpty(searchInput))
+            {
+                var Employees = _IemployeeRepository.GetAll();
+                var mappedEmployee = _Imapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeViewModel>>(Employees);
+                return View(mappedEmployee);
+            }
+            else
+            {
+                var Employees = _IemployeeRepository.GetEmployeeByName(searchInput);
+                var mappedEmployee = _Imapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeViewModel>>(Employees);
+                return View(mappedEmployee);
+            }
             //Extra Info
             //binding through View's Dictionary : transfer Data from Action to View
             //one way data Binding
             //1. ViewDate => key, Value
-            ViewData["Message"] = "Hello ViewData";
+            //ViewData["Message"] = "Hello ViewData";
             //2. ViewBag
-            ViewBag.Message = "Hello ViewBag";
-
-            return View(Employees);
+            //ViewBag.Message = "Hello ViewBag";
         }
 
         public IActionResult Create()
         {
+            //ViewData["DepartmentsViewData"] = _IdepartmentRepository.GetAll();
+            //ViewBag.DepartmentsViewBag = _IdepartmentRepository.GetAll();
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Employee employee)
+        public IActionResult Create(EmployeeViewModel employeeViewModel)
         {
             //3. TempData => from Action to Action
 
             if (ModelState.IsValid)
             {
-                var count = _IemployeeRepository.Add(employee);
+                ////Manual Mapping
+                //var mappedEmployee = new Employee()
+                //{
+                //    //if we have something in model not used in ViewModel u can put Default Value in Model
+                //    Name = employeeViewModel.Name,
+                //    Address = employeeViewModel.Address,
+                //    Age = employeeViewModel.Age,
+                //    Email = employeeViewModel.Email,
+                //    Salary = employeeViewModel.Salary,
+                //    IsActive = employeeViewModel.IsActive,
+                //    IsDeleted = employeeViewModel.IsDeleted,
+                //    HireDate = employeeViewModel.HireDate,
+                //    PhoneNumber = employeeViewModel.PhoneNumber,
+                //};
+
+                var mappedEmployee = _Imapper.Map<EmployeeViewModel, Employee>(employeeViewModel);
+                var count = _IemployeeRepository.Add(mappedEmployee);
                 if (count > 0)
                 {
                     TempData["Message"] = "Employee created Succesfully";
@@ -67,7 +102,7 @@ namespace assignment_30.PL.Controllers
                 }
                     return RedirectToAction(nameof(Index));
             }
-            return View(employee);
+            return View(employeeViewModel);
         }
 
         public IActionResult Details(int? id, string viewName = "Details")
@@ -77,6 +112,7 @@ namespace assignment_30.PL.Controllers
                 return BadRequest(); // 400
             }
             var employee = _IemployeeRepository.GetById(id.Value);
+            //ViewData["DepartmentsViewData"] = _IdepartmentRepository.GetAll();
             if (employee == null)
             {
                 return NotFound(); // 404
@@ -101,22 +137,23 @@ namespace assignment_30.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]  //dont allow any tools talking with website only website
-        public IActionResult Edit([FromRoute] int id, Employee employee)
+        public IActionResult Edit([FromRoute] int id, EmployeeViewModel employeeViewModel)
         // take id from Route not from Form (more secure)
         {
-            if (id != employee.Id)
+            if (id != employeeViewModel.Id)
             {
                 return BadRequest();
             }
 
             if (!ModelState.IsValid)
             {
-                return View(employee);
+                return View(employeeViewModel);
             }
 
             try
             {
-                _IemployeeRepository.Update(employee);
+                var mappedEmployee = _Imapper.Map<EmployeeViewModel, Employee>(employeeViewModel);
+                _IemployeeRepository.Update(mappedEmployee);
                 TempData["Message"] = "Edit Employee Successufuly";
                 return RedirectToAction(nameof(Index));
             }
@@ -127,7 +164,7 @@ namespace assignment_30.PL.Controllers
                     ModelState.AddModelError(string.Empty, ex.Message);
                 else
                     ModelState.AddModelError(string.Empty, "An Error occured during update Department");
-                return View(employee);
+                return View(employeeViewModel);
             }
         }
 
@@ -138,20 +175,21 @@ namespace assignment_30.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete([FromRoute]int id, Employee employee)
+        public IActionResult Delete([FromRoute]int id, EmployeeViewModel employeeViewModel)
         {
-            if (id != employee.Id)
+            if (id != employeeViewModel.Id)
             {
                 return BadRequest();
             }
             if (!ModelState.IsValid)
             {
-                return View(employee);
+                return View(employeeViewModel);
             }
 
             try
             {
-                _IemployeeRepository.Delete(employee);
+                var mappedEmployee = _Imapper.Map<EmployeeViewModel, Employee>(employeeViewModel);
+                _IemployeeRepository.Delete(mappedEmployee);
                 TempData["MessageDelete"] = "Delete Employee Successfuly";
                 return RedirectToAction(nameof(Index));
             }
@@ -165,7 +203,7 @@ namespace assignment_30.PL.Controllers
                 {
                     ModelState.AddModelError(string.Empty, "An Error occured during deleting department");
                 }
-                return View(employee);
+                return View(employeeViewModel);
             }
         }
     }

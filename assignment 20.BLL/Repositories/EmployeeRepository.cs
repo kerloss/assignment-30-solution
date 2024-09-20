@@ -24,5 +24,11 @@ namespace assignment_20.BLL.Repositories
             return _appDbContext.Employees.Where(e => e.Address.ToLower().Contains(address.ToLower()));
             //return _appDbContext.Employees.Where(e => e.Address.ToLower() == address.ToLower());
         }
+
+        public IQueryable<Employee> GetEmployeeByName(string name)
+        {
+            //return _appDbContext.Employees.Where(E => E.Name.ToLower().Contains(name.ToLower()));
+            return _appDbContext.Employees.Where(E => E.Name.ToLower() == name.ToLower());
+        }
     }
 }

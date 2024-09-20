@@ -1,6 +1,8 @@
 using assignment_20.BLL.Interfacies;
 using assignment_20.BLL.Repositories;
 using assignment_20.DAL.Data;
+using assignment_30.PL.Extenstions;
+using assignment_30.PL.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -27,7 +29,9 @@ namespace assignment_30.PL
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Register L built in MVC services to the container
             services.AddControllersWithViews();
+
             //services.AddSingleton<AppDbContext>();  //per application
             //services.AddScoped<AppDbContext>(); //per request
             //services.AddTransient<AppDbContext>();  //per operation
@@ -35,10 +39,11 @@ namespace assignment_30.PL
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-            });  //Default is scoped
+            },ServiceLifetime.Scoped);  //Default is AddScoped
 
-            services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            //ApplicationServicesExtentions.AddApplicationsServices(services);    //Static method
+            services.AddApplicationsServices(); //Extention method
+            services.AddAutoMapper(M => M.AddProfile(new mappingProfiles())); //life time is AddTransient by Default
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -17,5 +17,11 @@ namespace assignment_20.BLL.Repositories
         {
             //_appDbContext = DbContext;
         }
+
+        public IQueryable<Department> GetDepartmentByName(string name)
+        {
+            return _appDbContext.Departments.Where(D => D.Name.ToLower() == name.ToLower());
+            //return _appDbContext.Departments.Where(D => D.Name.ToLower().Contains(name.ToLower()));
+        }
     }
 }
