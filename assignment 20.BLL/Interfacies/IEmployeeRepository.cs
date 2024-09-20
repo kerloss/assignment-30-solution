@@ -17,5 +17,7 @@ namespace assignment_20.BLL.Interfacies
 
         //IQueable filterd data first in DB and after that get data that filterd
         IQueryable<Employee> GetEmployeeByAddress(string address);
+
+        IQueryable<Employee> GetEmployeeByName(string name);
     }
 }

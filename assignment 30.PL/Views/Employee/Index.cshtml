@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Employee>
+﻿@model IEnumerable<EmployeeViewModel>
 @{
     ViewData["Title"] = "Index";
 
@@ -15,6 +15,18 @@
 {
     <div class="alert alert-danger">@TempData["MessageDelete"]</div>
 }
+
+<div class="row justify-content-center align-items-center my-3">
+    <form asp-action="Index" class="row col-md-8 offset-2">
+        <div class="col-md-8">
+            <input type="text" name="searchInput" placeholder="Search By Name....." class="form-control"/>
+        </div>
+        <div>
+            <input type="submit" value="Search" class="btn btn-success"/>
+        </div>
+    </form>
+</div>
+
 <h1>All Employee</h1>
 <br />
 <br />
@@ -30,6 +42,7 @@
                 <th>@Html.DisplayNameFor(E => E.Name)</th>
                 <th>@Html.DisplayNameFor(E => E.Age)</th>
                 <th>@Html.DisplayNameFor(E => E.Address)</th>
+                <th>@Html.DisplayNameFor(E => E.departments)</th>
                 <th>@Html.DisplayNameFor(E => E.Salary)</th>
                 <th>@Html.DisplayNameFor(E => E.PhoneNumber)</th>
                 <th>@Html.DisplayNameFor(E => E.IsActive)</th>
@@ -47,6 +60,7 @@
                     <td>@employee.Name</td>
                     <td>@employee.Age</td>
                     <td>@employee.Address</td>
+                    <td>@employee.departments?.Name</td>
                     <td>@Html.DisplayFor(M => employee.Salary)</td>
                     <td>@employee.PhoneNumber</td>
                     <td>@Html.DisplayFor(M => employee.IsActive)</td>
