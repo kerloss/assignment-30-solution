@@ -1,6 +1,7 @@
 ﻿using assignment_20.BLL.Interfacies;
 using assignment_20.BLL.Repositories;
 using assignment_20.DAL.Models;
+using assignment_30.PL.Helpers;
 using assignment_30.PL.ViewModels;
 using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
@@ -21,14 +22,16 @@ namespace assignment_30.PL.Controllers
         /// Aggregation : optional [NULL]
         /// </summary>
         
-        private readonly IEmployeeRepository _IemployeeRepository;
+        //private readonly IEmployeeRepository _IemployeeRepository;
+        private readonly IUnitOfWork _iunitOfWork;
         private readonly IWebHostEnvironment _env;
         private readonly IMapper _Imapper;
-        private readonly IDepartmentRepository _IdepartmentRepository;
+        //private readonly IDepartmentRepository _IdepartmentRepository;
 
-        public EmployeeController(IEmployeeRepository employeeRepository,IWebHostEnvironment env /*,IDepartmentRepository departmentRepository*/, IMapper mapper)
+        public EmployeeController(IUnitOfWork iunitOfWork, IWebHostEnvironment env /*,IDepartmentRepository departmentRepository*/, IMapper mapper)
         {
-            _IemployeeRepository = employeeRepository;
+            _iunitOfWork = iunitOfWork;
+            //_IemployeeRepository = employeeRepository;
             _env = env;
             _Imapper = mapper;
             //_IdepartmentRepository = departmentRepository;
@@ -41,13 +44,13 @@ namespace assignment_30.PL.Controllers
             //Get All
             if (string.IsNullOrEmpty(searchInput))
             {
-                var Employees = _IemployeeRepository.GetAll();
+                var Employees = _iunitOfWork.IemployeeRepository.GetAll();
                 var mappedEmployee = _Imapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeViewModel>>(Employees);
                 return View(mappedEmployee);
             }
             else
             {
-                var Employees = _IemployeeRepository.GetEmployeeByName(searchInput);
+                var Employees = _iunitOfWork.IemployeeRepository.GetEmployeeByName(searchInput);
                 var mappedEmployee = _Imapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeViewModel>>(Employees);
                 return View(mappedEmployee);
             }
@@ -90,8 +93,11 @@ namespace assignment_30.PL.Controllers
                 //    PhoneNumber = employeeViewModel.PhoneNumber,
                 //};
 
+                employeeViewModel.ImageName = DocumentSettings.UploadFile(employeeViewModel.Image, "Images");
+
                 var mappedEmployee = _Imapper.Map<EmployeeViewModel, Employee>(employeeViewModel);
-                var count = _IemployeeRepository.Add(mappedEmployee);
+                _iunitOfWork.IemployeeRepository.Add(mappedEmployee); //State Added
+                var count = _iunitOfWork.savechange();
                 if (count > 0)
                 {
                     TempData["Message"] = "Employee created Succesfully";
@@ -111,13 +117,14 @@ namespace assignment_30.PL.Controllers
             {
                 return BadRequest(); // 400
             }
-            var employee = _IemployeeRepository.GetById(id.Value);
+            var employee = _iunitOfWork.IemployeeRepository.GetById(id.Value);
             //ViewData["DepartmentsViewData"] = _IdepartmentRepository.GetAll();
             if (employee == null)
             {
                 return NotFound(); // 404
             }
-            return View(viewName, employee);
+            var mappedEmployee = _Imapper.Map<Employee,EmployeeViewModel>(employee);
+            return View(viewName, mappedEmployee);
         }
 
         public IActionResult Edit(int? id)
@@ -152,8 +159,10 @@ namespace assignment_30.PL.Controllers
 
             try
             {
+                employeeViewModel.ImageName = DocumentSettings.UploadFile(employeeViewModel.Image, "Images");
                 var mappedEmployee = _Imapper.Map<EmployeeViewModel, Employee>(employeeViewModel);
-                _IemployeeRepository.Update(mappedEmployee);
+                _iunitOfWork.IemployeeRepository.Update(mappedEmployee); //State updated
+                _iunitOfWork.savechange();
                 TempData["Message"] = "Edit Employee Successufuly";
                 return RedirectToAction(nameof(Index));
             }
@@ -189,7 +198,9 @@ namespace assignment_30.PL.Controllers
             try
             {
                 var mappedEmployee = _Imapper.Map<EmployeeViewModel, Employee>(employeeViewModel);
-                _IemployeeRepository.Delete(mappedEmployee);
+                _iunitOfWork.IemployeeRepository.Delete(mappedEmployee);
+                _iunitOfWork.savechange();
+                DocumentSettings.DeleteFile(employeeViewModel.ImageName, "Images");
                 TempData["MessageDelete"] = "Delete Employee Successfuly";
                 return RedirectToAction(nameof(Index));
             }
