@@ -18,21 +18,21 @@ namespace assignment_20.BLL.Repositories
         {
             _appDbContext = DbContext;
         }
-        public int Add(T item)
+        public void Add(T item)
         {
             //call with DataBase
-            _appDbContext.Set<T>().Add(item);
+            _appDbContext.Set<T>().Add(item); //State Added
             //OR
             //_appDbContext.Add(item);
-            return _appDbContext.SaveChanges();
+            //return _appDbContext.SaveChanges();
         }
 
-        public int Delete(T item)
+        public void Delete(T item)
         {
-            _appDbContext.Set<T>().Remove(item);
+            _appDbContext.Set<T>().Remove(item); //State Deleted
             //OR
             //_appDbContext.Remove(item);
-            return _appDbContext.SaveChanges();
+            //return _appDbContext.SaveChanges();
         }
 
         public IEnumerable<T> GetAll()
@@ -53,10 +53,10 @@ namespace assignment_20.BLL.Repositories
             //return _appDbContext.Find<T>(id);
         }
 
-        public int Update(T item)
+        public void Update(T item)
         {
-            _appDbContext.Set<T>().Update(item);
-            return _appDbContext.SaveChanges();
+            _appDbContext.Set<T>().Update(item); //State Updated
+            //return _appDbContext.SaveChanges();
         }
     }
 }

@@ -13,6 +13,7 @@ namespace assignment_30.PL.Controllers
 {
     public class DepartmentController : Controller
     {
+
         // 1. inhertance => DepartmentController is a Controller
         // 2. Association => DepartmentController has a DepartmentRepository [Aggregation,Composition]
         /// <summary>
@@ -20,13 +21,15 @@ namespace assignment_30.PL.Controllers
         /// Aggregation : optional [NULL]
         /// </summary>
 
-        private readonly IDepartmentRepository _IdepartmentRepository;
+        //private readonly IDepartmentRepository _IdepartmentRepository;
+        private readonly IUnitOfWork _iunitOfWork;
         private readonly IWebHostEnvironment _env;
         private readonly IMapper _Imapper;
 
-        public DepartmentController(IDepartmentRepository departmentRepository , IWebHostEnvironment env, IMapper mapper)
+        public DepartmentController(IUnitOfWork iunitOfWork , IWebHostEnvironment env, IMapper mapper)
         {
-            _IdepartmentRepository = departmentRepository;
+            _iunitOfWork = iunitOfWork;
+            //_IdepartmentRepository = departmentRepository;
             _env = env;
             _Imapper = mapper;
         }
@@ -37,13 +40,13 @@ namespace assignment_30.PL.Controllers
             //Get All
             if (string.IsNullOrEmpty(searchInput))
             {
-            var Departments = _IdepartmentRepository.GetAll();
-                var mappedDepartment = _Imapper.Map<IEnumerable<Department>, IEnumerable<DepartmentViewModel>>(Departments);
+            var Departments = _iunitOfWork.IdepartmentRepository.GetAll();
+            var mappedDepartment = _Imapper.Map<IEnumerable<Department>, IEnumerable<DepartmentViewModel>>(Departments);
             return View(mappedDepartment);   
             }
             else
             {
-                var Departments = _IdepartmentRepository.GetDepartmentByName(searchInput);
+                var Departments = _iunitOfWork.IdepartmentRepository.GetDepartmentByName(searchInput);
                 var mappedDepartment = _Imapper.Map<IEnumerable<Department>, IEnumerable<DepartmentViewModel>>(Departments);
                 return View(mappedDepartment);
             }
@@ -62,7 +65,8 @@ namespace assignment_30.PL.Controllers
             if (ModelState.IsValid)
             {
                 var mappedDepartment = _Imapper.Map<DepartmentViewModel, Department>(departmentViewModel);
-                var count = _IdepartmentRepository.Add(mappedDepartment);
+                _iunitOfWork.IdepartmentRepository.Add(mappedDepartment); //State Added
+                var count = _iunitOfWork.savechange();
                 if (count > 0) 
                 {
                     TempData["Message"] = "Create Department Successfuly";
@@ -83,12 +87,13 @@ namespace assignment_30.PL.Controllers
             {
                 return BadRequest(); // 400
             }
-            var department = _IdepartmentRepository.GetById(id.Value);
+            var department = _iunitOfWork.IdepartmentRepository.GetById(id.Value);
+            var mappedDepartment = _Imapper.Map<Department, DepartmentViewModel>(department);
             if (department == null)
             {
                 return NotFound(); // 404
             }
-            return View(viewName, department);
+            return View(viewName, mappedDepartment);
         }
 
         // Department/Edit/10
@@ -126,7 +131,8 @@ namespace assignment_30.PL.Controllers
             try
             {
                 var mappedDepartment = _Imapper.Map<DepartmentViewModel, Department>(departmentViewModel);
-                _IdepartmentRepository.Update(mappedDepartment);
+                _iunitOfWork.IdepartmentRepository.Update(mappedDepartment); //State Modifyed
+                _iunitOfWork.savechange();
                 TempData["Message"] = "Edit Department Successfuly";
                 return RedirectToAction(nameof(Index));
             }
@@ -153,7 +159,8 @@ namespace assignment_30.PL.Controllers
             try
             {
                 var mappedDepartment = _Imapper.Map<DepartmentViewModel, Department>(departmentViewModel);
-                _IdepartmentRepository.Delete(mappedDepartment);
+                _iunitOfWork.IdepartmentRepository.Delete(mappedDepartment); //State Deleted
+                _iunitOfWork.savechange();
                 TempData["MessageDelete"] = "Delete Department Successfuly";
                 return RedirectToAction(nameof(Index));
             }

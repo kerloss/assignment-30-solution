@@ -44,6 +44,7 @@ namespace assignment_30.PL
             //ApplicationServicesExtentions.AddApplicationsServices(services);    //Static method
             services.AddApplicationsServices(); //Extention method
             services.AddAutoMapper(M => M.AddProfile(new mappingProfiles())); //life time is AddTransient by Default
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

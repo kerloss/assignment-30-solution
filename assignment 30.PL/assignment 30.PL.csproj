@@ -20,4 +20,8 @@
     <ProjectReference Include="..\assignment 20.BLL\assignment 20.BLL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Files\Images\" />
+  </ItemGroup>
+
 </Project>

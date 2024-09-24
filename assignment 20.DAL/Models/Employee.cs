@@ -59,5 +59,6 @@ namespace assignment_20.DAL.Models
         //[InverseProperty(nameof(Models.Department.employees))]
         public Department departments { get; set; }
         public int? DepartmentId { get; set; }  //FK Colomn //Default for delete in NoAction
+        public string ImageName { get; set; }
     }
 }
